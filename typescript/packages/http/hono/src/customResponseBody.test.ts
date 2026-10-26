@@ -113,7 +113,8 @@ async function buildApp(customBody?: HTTPResponseBody) {
 }
 
 describe.each(["unpaid", "settlement failure"] as const)("custom %s response body", mode => {
-  it.each([...bodies, { name: "default body", contentType: "application/json", expected: "{}" }])(
+  const expected = mode === "unpaid" ? '{"error":"Payment required"}' : "{}";
+  it.each([...bodies, { name: "default body", contentType: "application/json", expected }])(
     "preserves $name serialization through the Hono fetch handler",
     async fixture => {
       const { app, verify, settle, handler } = await buildApp(
